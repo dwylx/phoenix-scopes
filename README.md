@@ -4,8 +4,9 @@
 
 </div>
 
-This repo is a quick walkthrough of `Phoenix 1.8 scopes`
-following the official docs:
+This repo is a quick (though _comprehensive_) **walkthrough**
+of **`Phoenix 1.8 scopes`**
+following the **_official_ docs**:
 [hexdocs.pm/phoenix/1.8.1/scopes.html](https://hexdocs.pm/phoenix/1.8.1/scopes.html)
 
 ## 0. Prerequisites
@@ -338,3 +339,58 @@ Output looks promising:
 /*! 🌼 daisyUI 5.0.35 */
 Done in 108ms
 ```
+
+The homepage of the App now has **Register** and **Log in** links in the header:
+
+<img src="https://github.com/user-attachments/assets/8bec31f0-f2c0-4cb1-a1ce-58974e5e9ec8" />
+
+Clicking on the **Register** link
+the browser navigates to the
+[/users/register](http://localhost:4000/users/register)
+path:
+
+<img src="https://github.com/user-attachments/assets/dc43cc6b-339b-4023-b841-38cc7d4ee888" />
+
+Input any valid email address
+e.g: `test@mail.com`
+And click/tap on the "**Create an account**" button:
+
+<img src="https://github.com/user-attachments/assets/8526f6e6-4342-498e-8503-cb1c28b14aa3" />
+
+You should see a confirmation popup saying:
+"An email was sent to test@mail.com, please access it to confirm your account":
+
+<img width="939" height="651" alt="Image" src="https://github.com/user-attachments/assets/bf1e5608-0f81-4796-929e-844cfd992c88" />
+
+No email was sent as this is `localhost`.
+Instead, navigate to
+[localhost:4000/dev/mailbox/](http://localhost:4000/dev/mailbox/)
+where you will see the confirmation email:
+
+<img src="https://github.com/user-attachments/assets/66e7d25b-18fb-4251-9060-faa59e4c3a28" />
+
+Click on (or copy-paste) the link<sup>1</sup>
+to verify the email address.
+
+> <sup>1</sup> **Clicking** on **links** in **email**
+> is a **_massive_ security anti-pattern**
+> that primes people for
+> [**Phishing**](https://en.wikipedia.org/wiki/Phishing)
+> attacks which can result in a
+> [total system compromise](https://en.wikipedia.org/wiki/Advanced_persistent_threat).
+> If you work in a high security environment
+> or care about teaching people good security habits/practices,
+> don't encourage them to click links in emails. 🙏
+> It just takes _one_ "weakest link" in your organisation/family
+> to bring down the whole castle! 😢
+> But for the sake of following this guide ... 
+
+You will see a page similar to the following:
+
+<img width="1150" height="627" alt="Image" src="https://github.com/user-attachments/assets/60390afc-475e-4b15-adfd-0ac1c1aef867" />
+
+Click one of the buttons, e.g: "**Confirm and _stay_ logged in**".
+
+The "User confirmed successfully" dialogue will appear:
+
+<img width="1150" height="627" alt="Image" src="https://github.com/user-attachments/assets/af070656-ac23-4d9c-b8f1-c9c37ebfef59" />
