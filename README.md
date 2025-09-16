@@ -382,8 +382,8 @@ to verify the email address.
 > or care about teaching people good security habits/practices,
 > don't encourage them to click links in emails. 🙏
 > It just takes _one_ "weakest link" in your organisation/family
-> to bring down the whole castle! 😢
-> But for the sake of following this guide ... 
+> to bring down the whole castle! 😢 <br />
+> But for the sake of following this guide ...
 
 You will see a page similar to the following:
 
@@ -394,3 +394,48 @@ Click one of the buttons, e.g: "**Confirm and _stay_ logged in**".
 The "User confirmed successfully" dialogue will appear:
 
 <img width="1150" height="627" alt="Image" src="https://github.com/user-attachments/assets/af070656-ac23-4d9c-b8f1-c9c37ebfef59" />
+
+So we know the basic **`auth`** is working. ✅
+
+## 3. Create Blog With Scopes
+
+In the next section of the official `Scopes` docs
+["Integration of scopes in the Phoenix generators"](https://hexdocs.pm/phoenix/1.8.1/scopes.html#integration-of-scopes-in-the-phoenix-generators)
+we are instructed to run the following command:
+
+```sh
+mix phx.gen.live Blog Post posts title:string body:text
+```
+
+You should see output similar to the following:
+
+```sh
+* creating lib/my_app_web/live/post_live/show.ex
+* creating lib/my_app_web/live/post_live/index.ex
+* creating lib/my_app_web/live/post_live/form.ex
+* creating test/my_app_web/live/post_live_test.exs
+* creating lib/my_app/blog/post.ex
+* creating priv/repo/migrations/20250916103816_create_posts.exs
+* creating lib/my_app/blog.ex
+* injecting lib/my_app/blog.ex
+* creating test/my_app/blog_test.exs
+* injecting test/my_app/blog_test.exs
+* creating test/support/fixtures/blog_fixtures.ex
+* injecting test/support/fixtures/blog_fixtures.ex
+
+Add the live routes to your browser scope in lib/my_app_web/router.ex:
+
+    live "/posts", PostLive.Index, :index
+    live "/posts/new", PostLive.Form, :new
+    live "/posts/:id", PostLive.Show, :show
+    live "/posts/:id/edit", PostLive.Form, :edit
+
+Ensure the routes are defined in a block that sets the `:current_scope` assign.
+
+Remember to update your repository by running migrations:
+
+    $ mix ecto.migrate
+```
+
+Follow the instructions in the docs 
+to add the new routes to the _correct_ section in `router.ex`. 
