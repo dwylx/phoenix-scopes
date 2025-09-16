@@ -437,5 +437,63 @@ Remember to update your repository by running migrations:
     $ mix ecto.migrate
 ```
 
-Follow the instructions in the docs 
-to add the new routes to the _correct_ section in `router.ex`. 
+Follow the instructions in the docs _precisely_
+to add the new routes to the _correct_ section
+in `lib/my_app_web/router.ex`.
+
+Before:
+
+```elixir
+  ## Authentication routes
+
+  scope "/", MyAppWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [{MyAppWeb.UserAuth, :require_authenticated}] do
+      live "/users/settings", UserLive.Settings, :edit
+      live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+    end
+
+    post "/users/update-password", UserSessionController, :update_password
+  end
+```
+
+After:
+
+```elixir
+  ## Authentication routes
+
+  scope "/", MyAppWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [{MyAppWeb.UserAuth, :require_authenticated}] do
+      live "/users/settings", UserLive.Settings, :edit
+      live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+
+      live "/posts", PostLive.Index, :index
+      live "/posts/new", PostLive.Form, :new
+      live "/posts/:id", PostLive.Show, :show
+      live "/posts/:id/edit", PostLive.Form, :edit
+    end
+
+    post "/users/update-password", UserSessionController, :update_password
+  end
+```
+
+> 
+
+
+Migrate: 
+
+```sh
+11:38:23.288 [info] == Running 20250916103816 MyApp.Repo.Migrations.CreatePosts.change/0 forward
+
+11:38:23.289 [info] create table posts
+
+11:38:23.301 [info] create index posts_user_id_index
+
+11:38:23.302 [info] == Migrated 20250916103816 in 0.0s
+```
+
