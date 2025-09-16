@@ -482,10 +482,16 @@ After:
   end
 ```
 
-> 
+> The exact change is:
+> [phoenix-scopes/commit/b79b9cad](https://github.com/dwylx/phoenix-scopes/commit/b79b9cad2f1e80ad5e4e00498893133b6760111b#diff-3828157ee4f96c457294159c530cbbe444878213900c2ed88f0dddbc568f5ee5)
 
+Next run the migration:
 
-Migrate: 
+```sh
+mix ecto.migrate
+```
+
+You should see output similar to the following:
 
 ```sh
 11:38:23.288 [info] == Running 20250916103816 MyApp.Repo.Migrations.CreatePosts.change/0 forward
@@ -496,4 +502,68 @@ Migrate:
 
 11:38:23.302 [info] == Migrated 20250916103816 in 0.0s
 ```
+
+Run the App to confirm everything is working:
+
+```sh
+mix phx.server
+```
+
+```sh
+[info] Running MyAppWeb.Endpoint with Bandit 1.8.0 at 127.0.0.1:4000 (http)
+[info] Access MyAppWeb.Endpoint at http://localhost:4000
+[watch] build finished, watching for changes...
+≈ tailwindcss v4.1.7
+
+/*! 🌼 daisyUI 5.0.35 */
+Done in 111ms
+```
+
+No errors is a good sign.
+Refresh http://localhost:4000 in your browser.
+You should see that your previously authenticated session is still active:
+
+<img src="https://github.com/user-attachments/assets/e84a4aa9-48b5-4472-8542-219a22421cf5" />
+
+Good sign.
+
+**Note**: if you see the following output in your terminal:
+
+```sh
+[info] GET /apple-touch-icon-precomposed.png
+[debug] ** (Phoenix.Router.NoRouteError) no route found for GET /apple-touch-icon-precomposed.png (MyAppWeb.Router)
+    (my_app 0.1.0) deps/phoenix/lib/phoenix/router.ex:465: MyAppWeb.Router.call/2
+    (my_app 0.1.0) lib/my_app_web/endpoint.ex:1: MyAppWeb.Endpoint.plug_builder_call/2
+    (my_app 0.1.0) deps/plug/lib/plug/debugger.ex:155: MyAppWeb.Endpoint."call (overridable 3)"/2
+    (my_app 0.1.0) lib/my_app_web/endpoint.ex:1: MyAppWeb.Endpoint.call/2
+    (phoenix 1.8.1) lib/phoenix/endpoint/sync_code_reload_plug.ex:22: Phoenix.Endpoint.SyncCodeReloadPlug.do_call/4
+    (bandit 1.8.0) lib/bandit/pipeline.ex:131: Bandit.Pipeline.call_plug!/2
+    (bandit 1.8.0) lib/bandit/pipeline.ex:42: Bandit.Pipeline.run/5
+    (bandit 1.8.0) lib/bandit/http1/handler.ex:13: Bandit.HTTP1.Handler.handle_data/3
+    (bandit 1.8.0) lib/bandit/delegating_handler.ex:18: Bandit.DelegatingHandler.handle_data/3
+    (bandit 1.8.0) lib/bandit/delegating_handler.ex:8: Bandit.DelegatingHandler.handle_continue/2
+    (stdlib 6.2) gen_server.erl:2335: :gen_server.try_handle_continue/3
+    (stdlib 6.2) gen_server.erl:2244: :gen_server.loop/7
+    (stdlib 6.2) proc_lib.erl:329: :proc_lib.init_p_do_apply/3
+
+[info] GET /apple-touch-icon.png
+[debug] ** (Phoenix.Router.NoRouteError) no route found for GET /apple-touch-icon.png (MyAppWeb.Router)
+    (my_app 0.1.0) deps/phoenix/lib/phoenix/router.ex:465: MyAppWeb.Router.call/2
+    (my_app 0.1.0) lib/my_app_web/endpoint.ex:1: MyAppWeb.Endpoint.plug_builder_call/2
+    (my_app 0.1.0) deps/plug/lib/plug/debugger.ex:155: MyAppWeb.Endpoint."call (overridable 3)"/2
+    (my_app 0.1.0) lib/my_app_web/endpoint.ex:1: MyAppWeb.Endpoint.call/2
+    (phoenix 1.8.1) lib/phoenix/endpoint/sync_code_reload_plug.ex:22: Phoenix.Endpoint.SyncCodeReloadPlug.do_call/4
+    (bandit 1.8.0) lib/bandit/pipeline.ex:131: Bandit.Pipeline.call_plug!/2
+    (bandit 1.8.0) lib/bandit/pipeline.ex:42: Bandit.Pipeline.run/5
+    (bandit 1.8.0) lib/bandit/http1/handler.ex:13: Bandit.HTTP1.Handler.handle_data/3
+    (bandit 1.8.0) lib/bandit/delegating_handler.ex:18: Bandit.DelegatingHandler.handle_data/3
+    (bandit 1.8.0) lib/bandit/delegating_handler.ex:8: Bandit.DelegatingHandler.handle_continue/2
+    (stdlib 6.2) gen_server.erl:2335: :gen_server.try_handle_continue/3
+    (stdlib 6.2) gen_server.erl:2244: :gen_server.loop/7
+    (stdlib 6.2) proc_lib.erl:329: :proc_lib.init_p_do_apply/3
+```
+
+Don't worry, it's ... just a lack of icons.
+
+### 3.1 Test the Blog
 
