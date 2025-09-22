@@ -564,6 +564,30 @@ Good sign.
 ```
 
 Don't worry, it's ... just a lack of icons.
+It's safe to _ignore_ it if you're just speed-running through `Scopes`.
+But if you want to _fix_ it, see:
+[dwyl/learn-phoenix#163](https://github.com/dwyl/learn-phoenix/issues/163)
 
 ### 3.1 Test the Blog
 
+Visiting 
+[localhost:4000/posts](http://localhost:4000/posts/)
+we see the following:
+
+<img src="https://github.com/user-attachments/assets/df5399e0-8d40-4ade-b35d-0282d695cbfc" />
+
+**Note**: if you attempt to view this page _without_ authenticating,
+you will be redirected with a message:
+"You must log in to access this page."
+
+<img src="https://github.com/user-attachments/assets/2acf5fd3-5f53-49a0-8bb4-f26d96755e16" />
+
+If you haven't already followed the steps above to login, do that first.
+
+### Create Blog Post
+
+Input some text and click the "Save Post" button:
+
+<img src="https://github.com/user-attachments/assets/4733343a-7092-4b4e-ac02-7a2518f6e184" />
+
+<img src="https://github.com/user-attachments/assets/725ca2c8-65ad-4305-845f-60a6d6088b08" />
