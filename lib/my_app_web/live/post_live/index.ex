@@ -45,6 +45,7 @@ defmodule MyAppWeb.PostLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket) do
+      dbg(socket.assigns.current_scope.user)
       Blog.subscribe_posts(socket.assigns.current_scope)
     end
 

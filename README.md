@@ -576,9 +576,9 @@ we see the following:
 
 <img src="https://github.com/user-attachments/assets/df5399e0-8d40-4ade-b35d-0282d695cbfc" />
 
-**Note**: if you attempt to view this page _without_ authenticating,
+**Note**: if you attempt to view this page _without_ authenticating, <br />
 you will be redirected with a message:
-"You must log in to access this page."
+"_You must log in to access this page_."
 
 <img src="https://github.com/user-attachments/assets/2acf5fd3-5f53-49a0-8bb4-f26d96755e16" />
 
@@ -591,3 +591,136 @@ Input some text and click the "Save Post" button:
 <img src="https://github.com/user-attachments/assets/4733343a-7092-4b4e-ac02-7a2518f6e184" />
 
 <img src="https://github.com/user-attachments/assets/725ca2c8-65ad-4305-845f-60a6d6088b08" />
+
+### 3.2 Read the Code
+
+Now, let's look at the generated `LiveView`
+(`lib/my_app_web/live/post_live/index.ex`):
+
+```elixir
+defmodule MyAppWeb.PostLive.Index do
+  use MyAppWeb, :live_view
+
+  alias MyApp.Blog
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <Layouts.app flash={@flash} current_scope={@current_scope}>
+      <.header>
+        Listing Posts
+        <:actions>
+          <.button variant="primary" navigate={~p"/posts/new"}>
+            <.icon name="hero-plus" /> New Post
+          </.button>
+        </:actions>
+      </.header>
+
+      <.table
+        id="posts"
+        rows={@streams.posts}
+        row_click={fn {_id, post} -> JS.navigate(~p"/posts/#{post}") end}
+      >
+        <:col :let={{_id, post}} label="Title">{post.title}</:col>
+        <:col :let={{_id, post}} label="Body">{post.body}</:col>
+        <:action :let={{_id, post}}>
+          <div class="sr-only">
+            <.link navigate={~p"/posts/#{post}"}>Show</.link>
+          </div>
+          <.link navigate={~p"/posts/#{post}/edit"}>Edit</.link>
+        </:action>
+        <:action :let={{id, post}}>
+          <.link
+            phx-click={JS.push("delete", value: %{id: post.id}) |> hide("##{id}")}
+            data-confirm="Are you sure?"
+          >
+            Delete
+          </.link>
+        </:action>
+      </.table>
+    </Layouts.app>
+    """
+  end
+
+  @impl true
+  def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Blog.subscribe_posts(socket.assigns.current_scope)
+    end
+
+    {:ok,
+     socket
+     |> assign(:page_title, "Listing Posts")
+     |> stream(:posts, list_posts(socket.assigns.current_scope))}
+  end
+
+  @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    post = Blog.get_post!(socket.assigns.current_scope, id)
+    {:ok, _} = Blog.delete_post(socket.assigns.current_scope, post)
+
+    {:noreply, stream_delete(socket, :posts, post)}
+  end
+
+  @impl true
+  def handle_info({type, %MyApp.Blog.Post{}}, socket)
+      when type in [:created, :updated, :deleted] do
+    {:noreply, stream(socket, :posts, list_posts(socket.assigns.current_scope), reset: true)}
+  end
+
+  defp list_posts(current_scope) do
+    Blog.list_posts(current_scope)
+  end
+end
+```
+
+Every function from the Blog context that we call
+gets the current_scope assign passed in as the first argument.
+The `list_posts/1` function then uses that information to properly filter posts:
+
+```sh
+# lib/my_app/blog.ex
+def list_posts(%Scope{} = scope) do
+  Repo.all(from post in Post, where: post.user_id == ^scope.user.id)
+end
+```
+
+The `LiveView` even subscribes to scoped `PubSub` messages
+and automatically updates the rendered list
+whenever a new post is created
+or an existing post is updated or deleted,
+while ensuring that only messages for the current scope are processed.
+
+### 3.3 `dbg(socket.assigns.current_scope)`
+
+If you're curious what's in the `current_scope` struct, as I was,
+add a call to
+[`dbg()`](https://hexdocs.pm/elixir/debugging.html#dbg-2) 
+to print it out in your terminal inside `mount/3` function:
+
+```elixir
+dbg(socket.assigns.current_scope)
+```
+
+You should see output similar to the following:
+
+```sh
+socket.assigns.current_scope #=> %MyApp.Accounts.Scope{
+  user: #MyApp.Accounts.User<
+    __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+    id: 2,
+    email: "test@gmail.com",
+    confirmed_at: ~U[2025-09-15 10:44:29Z],
+    authenticated_at: ~U[2025-09-22 10:43:33Z],
+    inserted_at: ~U[2025-09-15 10:44:04Z],
+    updated_at: ~U[2025-09-15 10:44:29Z],
+    ...
+  >
+}
+```
+
+## 4. Defining Scopes
+
+This section corresponds to:
+[hexdocs.pm/phoenix/1.8.1/scopes.html#defining-scopes](https://hexdocs.pm/phoenix/1.8.1/scopes.html#defining-scopes)
+in the official docs.
