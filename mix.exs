@@ -11,7 +11,15 @@ defmodule MyApp.MixProject do
       aliases: aliases(),
       deps: deps(),
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        c: :test,
+        coveralls: :test,
+        "coveralls.json": :test,
+        "coveralls.html": :test,
+        t: :test
+      ]
     ]
   end
 
@@ -66,7 +74,10 @@ defmodule MyApp.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+
+      # Track test coverage: github.com/parroty/excoveralls
+      {:excoveralls, "~> 0.18", only: [:test, :dev]},
     ]
   end
 
@@ -89,7 +100,11 @@ defmodule MyApp.MixProject do
         "esbuild my_app --minify",
         "phx.digest"
       ],
-      precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test"]
+      precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test"],
+      test: ["ecto.reset", "test"],
+      t: ["test"],
+      c: ["coveralls.html"],
+      s: ["phx.server"]
     ]
   end
 end
