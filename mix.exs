@@ -77,7 +77,7 @@ defmodule MyApp.MixProject do
       {:bandit, "~> 1.5"},
 
       # Track test coverage: github.com/parroty/excoveralls
-      {:excoveralls, "~> 0.18", only: [:test, :dev]},
+      {:excoveralls, "~> 0.18", only: [:test, :dev], runtime: false}
     ]
   end
 
