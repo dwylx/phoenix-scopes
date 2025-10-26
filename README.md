@@ -844,3 +844,41 @@ defmodule MyApp.Scope do
 end
 ```
 
+Next, we define a `plug` in our router 
+that assigns a scope to each request:
+Open the `lib/my_app_web/router.ex` file
+and add the following line to the `:browser` pipeline:
+
+```elixir
+plug :assign_scope
+```
+
+the add the following function to the same file:
+
+```elixir
+  defp assign_scope(conn, _opts) do
+    if id = get_session(conn, :scope_id) do
+      assign(conn, :current_scope, MyApp.Scope.for_id(id))
+    else
+      id = System.unique_integer()
+
+      conn
+      |> put_session(:scope_id, id)
+      |> assign(:current_scope, MyApp.Scope.for_id(id))
+    end
+  end
+```
+
+Create a new test fixtures module with the path:
+`test/support/fixtures/scope_fixtures.ex`
+and paste the following code:
+
+```elixir
+defmodule MyApp.ScopeFixtures do
+  alias MyApp.Scope
+
+  def session_scope_fixture(id \\ System.unique_integer()) do
+    %Scope{id: id}
+  end
+end
+```

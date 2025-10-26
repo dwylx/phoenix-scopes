@@ -11,6 +11,19 @@ defmodule MyAppWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_scope_for_user
+    plug :assign_scope
+  end
+
+  defp assign_scope(conn, _opts) do
+    if id = get_session(conn, :scope_id) do
+      assign(conn, :current_scope, MyApp.Scope.for_id(id))
+    else
+      id = System.unique_integer()
+
+      conn
+      |> put_session(:scope_id, id)
+      |> assign(:current_scope, MyApp.Scope.for_id(id))
+    end
   end
 
   pipeline :api do
