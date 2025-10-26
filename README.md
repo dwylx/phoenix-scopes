@@ -724,3 +724,123 @@ socket.assigns.current_scope #=> %MyApp.Accounts.Scope{
 This section corresponds to:
 [hexdocs.pm/phoenix/1.8.1/scopes.html#defining-scopes](https://hexdocs.pm/phoenix/1.8.1/scopes.html#defining-scopes)
 in the official docs.
+
+The Phoenix generators use your app's config
+to discover the available `scopes`.
+A `scope` is defined by the following options:
+
+```elixir
+config :my_app, :scopes,
+  user: [
+    default: true,
+    module: MyApp.Accounts.Scope,
+    assign_key: :current_scope,
+    access_path: [:user, :id],
+    schema_key: :user_id,
+    schema_type: :id,
+    schema_table: :users,
+    test_data_fixture: MyApp.AccountsFixtures,
+    test_setup_helper: :register_and_log_in_user
+  ]
+```
+
+In this example, the `scope` is called `user`
+and it is the `default` `scope`
+that is automatically used
+when running
+`mix phx.gen.schema`,
+`mix phx.gen.context`,
+`mix phx.gen.live`,
+`mix phx.gen.html` and
+`mix phx.gen.json`.
+A `scope` needs a module that defines a struct,
+in this case `MyApp.Accounts.Scope`.
+Those structs are used as first argument
+to the generated context functions, like `list_posts/1`.
+
+* `default` - a boolean that indicates if this `scope` is the default `scope`.
+  There can only be **one** default `scope` defined.
+
+* `module` - the module that defines the **struct** for this scope.
+  In our case: `lib/my_app/accounts/scope.ex`
+
+* `assign_key` - the key where the scope struct is assigned to the
+  [socket](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Socket.html#t:t/0)
+  or
+  [conn](https://hexdocs.pm/plug/Plug.Conn.html).
+
+* `access_path` - a list of keys that define the path
+  to the identifying a field in the scope struct.
+  The generators generate code like
+  `where: schema_key == ^scope.user.id`.
+
+* `route_prefix` - (optional) a path template string
+  for how resources should be nested.
+  For example, `/orgs/:org` would generate routes like `/orgs/:org/posts`.
+  The parameter segment (`:org`) will be replaced
+  with the appropriate scope access value in templates and `LiveViews`.
+
+* `route_access_path` - (optional) list of keys
+  that define the path to the field used in route generation
+  (if `route_prefix` is set).
+  This is particularly useful for user-friendly URLs
+  where you might want to use a slug instead of an ID.
+  If not specified, it defaults to
+  `Enum.drop(scope.access_path, -1)` or `access_path`
+  if the former is empty.
+  For example, if the `access_path` is `[:organization, :id]`,
+  it defaults to `[:organization]`,
+  assuming that the value at `scope.organization`
+  implements the `Phoenix.Param` protocol.
+
+* `schema_key` - the foreign key that ties the resource to the scope.
+  New scoped schemas are created with a foreign key field named `schema_key`
+  of type `schema_type` to the `schema_table` table.
+
+* `schema_type` - the type of the foreign key field in the schema.
+  Typically `:id` or `:binary_id`.
+
+* `schema_migration_type` (optional) - the type of the
+  foreign key column in the database.
+  Used for the generated migration.
+  It defaults to the default migration foreign keytype.
+
+* `schema_table` - the name of the table where the foreign key points to.
+
+* `test_data_fixture` - a module that is automatically imported
+  into the context test file.
+  It must have a `NAME_scope_fixture/0` function
+  that returns a unique scope struct for context tests,
+  in this case `user_scope_fixture/0`.
+
+* `test_setup_helper` - the name of a function that is registered as
+  [`setup` callback](https://hexdocs.pm/ex_unit/ExUnit.Callbacks.html#setup/1)
+  in LiveView / Controller tests.
+  The function is expected to be imported in the test file.
+  Usually, this is ensured by putting it into the `MyAppWeb.ConnCase` module.
+
+While the `mix phx.gen.auth` automatically generates a scope,
+scopes can also be defined manually.
+This can be useful, for example, to retrofit an existing application with scopes
+or to define scopes that are not tied to a user.
+
+For this example, we will implement a custom scope
+that gives each session its own scope.
+While this might not be useful in most real-world applications
+as created resources would be inaccessible as soon as the session ends,
+it is a good example to understand how scopes work.
+See the following section for an example on how to augment an existing scope
+with organizations (teams, companies, or similar).
+
+First, let's define our scope module `lib/my_app/scope.ex` (new file):
+
+```elixir
+defmodule MyApp.Scope do
+  defstruct id: nil
+
+  def for_id(id) do
+    %MyApp.Scope{id: id}
+  end
+end
+```
+
